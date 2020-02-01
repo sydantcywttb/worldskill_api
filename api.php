@@ -1,6 +1,6 @@
 <?php
 
-$arResult = [];
+$RESULT = [];
 
 $DB = new PDO('mysql:host=localhost;dbname=worldapi', 'mysql', 'mysql');
 
@@ -16,11 +16,11 @@ function getUsers() {
     return $rows;
 }
 
-$arResult['USERS'] = getUsers();
+$RESULT['USERS'] = getUsers();
 
 if(isset($_POST['api']) || isset($_GET['api'])) {
 
     header('HTTP/1.1 200 OK');
     header('Content-Type: application/json;');
-    print_r(json_encode($arResult));
+    print_r(json_encode($RESULT));
 }
