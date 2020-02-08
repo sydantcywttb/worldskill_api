@@ -1,4 +1,6 @@
 var STORE = window.STORE || [];
+var PARAM_GET = window._GET || [];
+var PARAM_POST = window._POST || [];
 
 function ok(msg) {
     return {
@@ -6,6 +8,7 @@ function ok(msg) {
         'data': msg,
     }
 }
+
 function err(msg) {
     return {
         'status': false,
@@ -43,26 +46,8 @@ function API() {
 let $api = new API();
 $api.get();
 
-function User() {
-    let tableName = 'users';
-    this.add = (login, password) => {
-        if (this.getByField('login', login)) {
-            return err('Пользователь существует');
-        }
-        STORE[tableName].push({
-            'login': login,
-            'password': password,
-            'created_at': 1,
-        });
-
-        $api.update(function(resp) {
-            console.log(resp);
-        });
-
-        return ok('Пользователь добавлен');
-    };
-
-    this.getByField = (key, value) => {
+function DB() {
+    this.getByField = (tableName, key, value) => {
         let result = false;
 
         $.map(STORE[tableName], function (row, i) {
@@ -74,7 +59,66 @@ function User() {
     }
 }
 
-let $user = new User();
-console.log($user.getByField('id', 1));
-console.log($user.add('test', '123'));
+let $db = new DB();
 
+function User() {
+
+    let tableName = 'users';
+
+    this.add = (arParams = {}, done) => {
+        if (this.getByField('login', arParams['login'])) {
+            done(err('Пользователь существует'));
+            return;
+        }
+        arParams['created_at'] = 1;
+        STORE[tableName].push(arParams);
+
+        $api.update(function (resp) {
+            done(ok('Пользователь добавлен'));
+        });
+
+    };
+
+    this.getByField = (key, value) => {
+        return $db.getByField(tableName, key, value);
+    }
+}
+
+let $user = new User();
+
+
+if (PARAM_GET) {
+    if (PARAM_GET.hasOwnProperty('method')) {
+        switch (PARAM_GET['method']) {
+            case 'register':
+                let result = $user.add(PARAM_GET);
+                if(result['status']) {
+                    $('body').prepend('<div class="alert-success">'+result['data']+'<div>');
+                } else {
+                    $('body').prepend('<div class="alert-danger">'+result['data']+'<div>');
+                }
+                break;
+
+        }
+        $api.get();
+    }
+}
+
+$('#register').on('submit', function(e) {
+    e.preventDefault();
+
+    let data = {};
+    $('#register').find('input[name]').each(function() {
+        data[$(this).attr('name')] = $(this).val();
+    });
+
+    $user.add(data, function(result) {
+        if(result['status']) {
+            $('body').prepend('<div class="alert-success">'+result['data']+'<div>');
+        } else {
+            $('body').prepend('<div class="alert-danger">'+result['data']+'<div>');
+        }
+    });
+
+    return false;
+})

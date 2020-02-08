@@ -11,6 +11,9 @@
 <body>
 <script>
     window.STORE = <? print_r(json_encode($RESULT))?>;
+    window._GET = <?= json_encode($_GET)?>;
+    window._POST = <?= json_encode($_POST)?>;
+
 </script>
 <ul class="nav justify-content-center">
     <li class="nav-item">
