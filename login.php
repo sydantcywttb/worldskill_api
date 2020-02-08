@@ -12,7 +12,7 @@ if (isset($_POST['method']) && $_POST['method'] == 'login') {
     $password = $_POST['password'];
 
     $isFound = false;
-    foreach ($RESULT['USERS'] as $user) {
+    foreach ($RESULT['users'] as $user) {
         if ($user['login'] == $login && $user['password'] == $password) {
 
             $isFound = true;

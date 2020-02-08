@@ -7,11 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>WorldSkills</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/popper.min.js"></script>
 </head>
 <body>
-
+<script>
+    window.STORE = <? print_r(json_encode($RESULT))?>;
+</script>
 <ul class="nav justify-content-center">
     <li class="nav-item">
         <a class="nav-link" href="/">Главная</a>
