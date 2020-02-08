@@ -74,6 +74,7 @@ function User() {
         STORE[tableName].push(arParams);
 
         $api.update(function (resp) {
+            $api.get();
             done(ok('Пользователь добавлен'));
         });
 
@@ -85,24 +86,6 @@ function User() {
 }
 
 let $user = new User();
-
-
-if (PARAM_GET) {
-    if (PARAM_GET.hasOwnProperty('method')) {
-        switch (PARAM_GET['method']) {
-            case 'register':
-                let result = $user.add(PARAM_GET);
-                if(result['status']) {
-                    $('body').prepend('<div class="alert-success">'+result['data']+'<div>');
-                } else {
-                    $('body').prepend('<div class="alert-danger">'+result['data']+'<div>');
-                }
-                break;
-
-        }
-        $api.get();
-    }
-}
 
 $('#register').on('submit', function(e) {
     e.preventDefault();
