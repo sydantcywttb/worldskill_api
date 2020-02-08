@@ -4,6 +4,8 @@ $DB = new PDO('mysql:host=localhost;dbname=worldapi', 'mysql', 'mysql');
 
 $tables = [
     'users' => ['login', 'password', 'created_at', 'updated_at', 'deleted_at'],
+    'topics' => ['title', 'content', 'parent_id', 'level',
+        'created_at', 'updated_at', 'deleted_at'],
 ];
 
 $RESULT = [];
@@ -17,6 +19,21 @@ if (isset($_GET['api']) && $_GET['api'] === 'all') {
 
     header('HTTP/1.1 200 OK');
     header('Content-Type: application/json;');
+    print_r(json_encode($RESULT));
+    die();
+}
+
+if (isset($_GET['api']) && $_GET['api'] === 'update_session') {
+
+    header('HTTP/1.1 200 OK');
+    header('Content-Type: application/json;');
+
+    if (strlen($_GET['login']) > 1) {
+        setcookie('login', $_GET['login'], time() + 60 * 60 * 30);
+    } else {
+        setcookie('login', '', time() - 60 * 60 * 30);
+    }
+
     print_r(json_encode($RESULT));
     die();
 }

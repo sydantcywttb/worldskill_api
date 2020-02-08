@@ -1,48 +1,22 @@
 <?php
 
 require "head.php";
-
-global $DB, $RESULT;
-
-$err = false;
-
-if (isset($_POST['method']) && $_POST['method'] == 'login') {
-
-    $login = $_POST['login'];
-    $password = $_POST['password'];
-
-    $isFound = false;
-    foreach ($RESULT['users'] as $user) {
-        if ($user['login'] == $login && $user['password'] == $password) {
-
-            $isFound = true;
-
-            setcookie('USER', json_encode($user));
-            header('Location: /');
-            break;
-        }
-    }
-
-    if(!$isFound) {
-        $err = 'User did not find or password is not right';
-    }
-
-}
-
 require "header.php";
 
-if($err) {
-    showError($err);
-}
 ?>
 
-<form method="post" action="">
-    <input type="hidden" name="method" value="login">
+    <form id="loginForm" method="post" action="">
 
-    <input type="text" name="login" placeholder="Login">
-    <input type="password" name="password" placeholder="Password">
-    <input type="submit" value="Login">
-</form>
+        <div class="form-group">
+            <label for="login">Логин</label>
+            <input type="text" name="login" class="form-control" id="login" aria-describedby="emailHelp">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" name="password" class="form-control" id="password">
+        </div>
+        <button type="submit" class="btn btn-primary">Вход</button>
+    </form>
 
 <?
 require "footer.php";

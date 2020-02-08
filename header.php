@@ -15,20 +15,31 @@
     window._POST = <?= json_encode($_POST)?>;
 
 </script>
-<ul class="nav justify-content-center">
-    <li class="nav-item">
-        <a class="nav-link" href="/">Главная</a>
-    </li>
-    <? if ($USER): ?>
-        <li class="nav-item">
-            <a class="nav-link" href="/exit.php">Выход</a>
-        </li>
-    <? else: ?>
-        <li class="nav-item">
-            <a class="nav-link" href="/login.php">Вход</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/register.php">Регистрация</a>
-        </li>
-    <? endif; ?>
-</ul>
+<div class="alerts"></div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Главная</a>
+            </li>
+            <? if ($USER): ?>
+                <li class="nav-item">
+                    <a class="nav-link action-exit" href="#">Выход</a>
+                </li>
+            <? else: ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="/login.php">Вход</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register.php">Регистрация</a>
+                </li>
+            <? endif; ?>
+        </ul>
+    </div>
+</nav>
+<div class="container">
