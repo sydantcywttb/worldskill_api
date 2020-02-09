@@ -1,6 +1,5 @@
 <?php
 
-$USER = $_COOKIE['login'];
-
+$USER = $_COOKIE['user'];
 require "api.php";
 ?>

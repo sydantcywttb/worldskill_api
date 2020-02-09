@@ -3,8 +3,9 @@
 $DB = new PDO('mysql:host=localhost;dbname=worldapi', 'mysql', 'mysql');
 
 $tables = [
-    'users' => ['login', 'password', 'created_at', 'updated_at', 'deleted_at'],
+    'users' => ['login', 'password', 'created_at', 'updated_at', 'deleted_at', 'group_id'],
     'topics' => ['title', 'content', 'parent_id', 'level',
+        'owner_login', 'is_championship', 'manager_login',
         'created_at', 'updated_at', 'deleted_at'],
 ];
 
@@ -14,26 +15,12 @@ foreach ($tables as $tableName => $value) {
     $query->execute();
     $RESULT[$tableName] = $query->fetchAll(PDO::FETCH_ASSOC);
 }
+$RESULT['user'] = $_COOKIE['user'];
 
 if (isset($_GET['api']) && $_GET['api'] === 'all') {
 
     header('HTTP/1.1 200 OK');
     header('Content-Type: application/json;');
-    print_r(json_encode($RESULT));
-    die();
-}
-
-if (isset($_GET['api']) && $_GET['api'] === 'update_session') {
-
-    header('HTTP/1.1 200 OK');
-    header('Content-Type: application/json;');
-
-    if (strlen($_GET['login']) > 1) {
-        setcookie('login', $_GET['login'], time() + 60 * 60 * 30);
-    } else {
-        setcookie('login', '', time() - 60 * 60 * 30);
-    }
-
     print_r(json_encode($RESULT));
     die();
 }
@@ -46,7 +33,20 @@ if (isset($_POST['api']) && $_POST['api'] === 'update') {
     $data = json_decode($_POST['data'], true);
 
     if (isset($data) && is_array($data)) {
+
+        // login
+        if(isset($data['user'])) {
+            if(strlen($data['user']) > 1) {
+                setcookie('user', $data['user'], time() + 60 * 60 * 30);
+            } else {
+                setcookie('user', '', time() - 60 * 60 * 30);
+            }
+        }
+
+        // update data
         foreach ($data as $tableName => $rows) {
+
+            if(!is_array($rows)) continue;
 
             foreach ($rows as $row) {
                 if (isset($row['created_at']) && $row['created_at'] === 1) {

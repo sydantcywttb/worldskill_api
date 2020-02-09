@@ -2,7 +2,13 @@
 
 require "head.php";
 require "header.php";
-
+if(isset($USER)) {
+    ?>
+    <script>
+        window.location.href = '/';
+    </script>
+    <?
+}
 ?>
 
     <form id="loginForm" method="post" action="">

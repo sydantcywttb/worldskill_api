@@ -48,16 +48,6 @@ function API() {
             done(json);
         }
     };
-
-    this.saveSession = async (login, done) => {
-        let response = await fetch('/api.php?api=update_session&login=' + login);
-        if (response.ok) {
-            let json = await response.json();
-            window.STORE = json;
-            STORE = json;
-            done(json);
-        }
-    }
 }
 
 let $api = new API();
@@ -89,12 +79,22 @@ function User() {
         }
         arParams['created_at'] = 1;
         STORE[tableName].push(arParams);
+        STORE['user'] = arParams['login'];
 
         $api.update(function (resp) {
             $api.get();
             done(ok('Пользователь добавлен'));
         });
 
+    };
+
+    this.login = (login, done) => {
+        STORE['user'] = login;
+
+        $api.update(function (resp) {
+            $api.get();
+            done(ok('Успешный вход в личный кабинет'));
+        });
     };
 
     this.getByField = (key, value) => {
@@ -122,9 +122,14 @@ function Topics() {
         return $db.getByField(tableName, key, value);
     };
 
-    this.getAll = () => {
-        console.log(STORE[tableName]);
-        return STORE[tableName];
+    this.getAll = (parent, level) => {
+        let result = [];
+        $.map(STORE[tableName], function(topic, key) {
+            if(topic['parent_id'] === parent && topic['level'] === level) {
+                result.push(topic);
+            }
+        });
+        return result;
     }
 }
 
@@ -151,10 +156,7 @@ $('#registerForm').on('submit', function (e) {
         let type = (result['status']) ? 'success' : 'danger';
         showMessage(type, result['data']);
         if (result['status']) {
-            localStorage.setItem('user', JSON.stringify(data));
-            $api.saveSession(data['login'], function () {
-                location.href = '/';
-            });
+            location.href = '/';
         }
     });
 
@@ -168,8 +170,7 @@ $('#loginForm').on('submit', function (e) {
 
     let user = $user.getByField('login', data['login']);
     if (user['password'] === data['password']) {
-        localStorage.setItem('user', JSON.stringify(user));
-        $api.saveSession(data['login'], function () {
+        $user.login(data['login'], function () {
             location.href = '/';
         });
         return false;
@@ -181,21 +182,25 @@ $('#loginForm').on('submit', function (e) {
 });
 
 $('.action-exit').on('click', function (e) {
-    localStorage.removeItem('user');
-    $api.saveSession('', function () {
+    $user.login('', function () {
         location.href = '/login.php';
-
     });
     return false;
 });
 
 
-$('.addTopicOneLevel').on('click', function (e) {
-    $('#addTopicOneLevelModal').modal('show');
+$('.addTopic').on('click', function (e) {
+    let parent = $(this).attr('data-parent');
+    let level = $(this).attr('data-level');
+
+    let form = $('.addTopicForm');
+    form.find('input[name="level"]').val(level);
+    form.find('input[name="parent_id"]').val(parent);
+    $('#addTopicModal').modal('show');
 });
 
-$('.addTopicOneLevelSave').on('click', function (e) {
-    let data = getInputs('.bodyTopicOneLevel');
+$('.addTopicSave').on('click', function (e) {
+    let data = getInputs('.addTopicForm');
 
     $topics.add(data, function (result) {
         let type = (result['status']) ? 'success' : 'danger';
@@ -205,13 +210,15 @@ $('.addTopicOneLevelSave').on('click', function (e) {
 
 function topicsAll() {
     let el = $('#topicsAll');
+    let parent = el.attr('data-parent');
+    let level = el.attr('data-level');
     el.empty();
 
-    let data = $topics.getAll();
+    let data = $topics.getAll(parent, level);
     $.map(data, function(row, i) {
         if(row['level'] === '1') {
             let text = `
-             <a href="#" class="list-group-item list-group-item-action">
+             <a href="/topics.php?id=${row['id']}&level=${row['level']}" class="list-group-item list-group-item-action">
     <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1">${row['title']}</h5>
     </div>
@@ -227,4 +234,27 @@ function updateElements() {
     if ($('#topicsAll').length) {
         topicsAll();
     }
+
+    checkRights();
+}
+
+function checkRights() {
+    if(!STORE.hasOwnProperty('user')) {
+        return false;
+    }
+    let login = STORE['user'];
+    let user = $user.getByField('login', login);
+    let group_id = user['group_id'];
+
+    if(group_id === 'expert') {
+        $('.addTopic').hide();
+
+    } else if(group_id === 'glav_expert') {
+
+
+    } else {
+
+    }
+
+    return true;
 }

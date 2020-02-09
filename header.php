@@ -23,7 +23,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
+        <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="/">Главная</a>
             </li>
@@ -40,6 +40,13 @@
                 </li>
             <? endif; ?>
         </ul>
+        <span class="navbar-text">
+          <?if($USER):?>
+            <?= $USER; ?>
+            <?else:?>
+          Гость
+            <?endif;?>
+        </span>
     </div>
 </nav>
 <div class="container">
