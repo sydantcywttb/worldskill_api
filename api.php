@@ -7,6 +7,11 @@ $tables = [
     'topics' => ['title', 'content', 'parent_id', 'level',
         'owner_login', 'is_championship', 'manager_login',
         'created_at', 'updated_at', 'deleted_at'],
+    'themes' => ['title', 'content', 'parent_id', 'type', 'owner_login',
+        'created_at', 'updated_at', 'deleted_at'],
+    'messages' => ['content', 'qu_content', 'parent_id', 'owner_login',
+        'created_at', 'updated_at', 'deleted_at'],
+    'theme_users' => ['theme_id', 'login', 'created_at', 'updated_at', 'deleted_at'],
 ];
 
 $RESULT = [];
@@ -89,13 +94,16 @@ if (isset($_POST['api']) && $_POST['api'] === 'update') {
                             $fieldKeys[] = $columnName . '=' . ':' . $columnName;
                         }
                     }
+                    $fields[':id'] = $row['id'];
 
                     // form sql
                     $strKeys = join(',', $fieldKeys);
                     $strSql = "UPDATE {$tableName} SET {$strKeys} WHERE id=:id";
 
+
                     $sql = $DB->prepare($strSql);
                     $result = $sql->execute($fields);
+
                 }
 
 
@@ -103,4 +111,34 @@ if (isset($_POST['api']) && $_POST['api'] === 'update') {
         }
     }
     print_r(json_encode(['status' => true]));
+}
+
+function getTopicById($id) {
+
+    global $RESULT;
+    foreach ($RESULT['topics'] as $topic) {
+        if($topic['id'] === $id) return $topic;
+    }
+
+    return false;
+}
+
+function getTopicsByParentId($parent_id) {
+    $arResult = [];
+    global $RESULT;
+    foreach ($RESULT['topics'] as $topic) {
+        if($topic['parent_id'] === $parent_id) $arResult[] = $topic;
+    }
+
+    return $arResult;
+}
+
+function getThemeById($id) {
+
+    global $RESULT;
+    foreach ($RESULT['themes'] as $theme) {
+        if($theme['id'] === $id) return $theme;
+    }
+
+    return false;
 }
